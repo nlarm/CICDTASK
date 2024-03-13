@@ -1,7 +1,11 @@
 pipeline {
 
     agent any
-    
+
+    environment { 
+        CICDTask = 'HellowWord'
+    }
+
     stages {
         stage('STAGE 00'){
             steps{
