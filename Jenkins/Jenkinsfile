@@ -63,26 +63,26 @@ pipeline {
             steps { echo "É ELA" } 
         }
 
-        matrix {
-            axes {
-                axis {
-                    name 'NAVEGADOR'
-                    values 'chrome'
+        stage {
+            matrix {
+                axes {
+                    axis {
+                        name 'NAVEGADOR'
+                        values 'chrome'
+                    }
+                    axis {
+                        name 'PLATFORM'
+                        values  'windows', 'macos'
+                    }
                 }
-                axis {
-                    name 'PLATFORM'
-                    values  'windows', 'macos'
+                stages {
+                    stage('Build and test') {
+                        
+                    }
+                    stage('Release') {
+                        
+                    }
                 }
-            }
-            stages {
-                stage('Build and test') {
-                    
-                }
-                stage('Release') {
-                    
-                }
-
-                
             }
         }
     }
