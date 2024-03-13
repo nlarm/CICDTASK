@@ -1,25 +1,88 @@
 pipeline {
-
     agent any
 
     environment { 
-        CICDTask = 'HellowWord'
+        NOMES = 'Adriana_Daniel_Nefi'
+    }
+
+    options {
+        skipDefaultCheckout()
+        retry(2)
+        timeout(time: 30, unit: 'SECONDS')
+        timestamps()
+    }
+
+    parameters { 
+        text(name: 'BIOGRAPHY', defaultValue: 'Best testers', description: 'Message to represent the group')
+    }
+
+    triggers { 
+        cron('H H(9-16)/2 * * 1-5') # once in every two hours slot between 9 AM and 5 PM every weekday (perhaps at 10:38 AM, 12:38 PM, 2:38 PM, 4:38 PM)
+    }
+
+    post{
+        success{ echo "success"}
+        aborted{ echo "aborted"}
+        failure{ echo "failure"}
+        unstable{ echo "unstable"}
+        always{ echo "always"}
+        unsuccessful{ echo "unsuccessful"}
+        changed{ echo "changed"}
+        fixed{ echo "fixed"}
     }
 
     stages {
-        stage('STAGE 00'){
-            steps{
-
-                echo "Pipeline Usando Jenkinsfile"
+        stage('Primeiro Stage') { 
+            steps {
+                echo "${params.PERSON}"
+                echo "Nossos nomes sao ${NOMES}" # NOME=Adriana_Daniel_Nefi
             }
         }
+        stage('Segundo Stage') { 
+            environment { 
+                NOME = 'Nefi_Daniel_Adriana'
+            }           
+            steps {
+                echo "${params.PERSON}"
+                echo "Meu nome é ${NOME}"  # NOME=Morais
+            }
+        }
+        stage('Terceiro Stage') { 
+             input{
+                message "Continuar?"
+                ok "Sim!"
+                submitter 'Eu,Voce,Ele'
+                parameters {
+                   string(name: 'MENSAGEM', description: 'Digite uma mensagem', defaultValue: 'Vamos em frente')
+                }
+            }
+            steps { echo 'Continuamos, com a mensagem: ${MENSAGEM}' }
+        }
+        stage('Quarto Stage') { 
+            when { environment name: 'NOME', value: 'Adriana' }
+            steps { echo "É ELA" } 
+        }
 
-        stage('STAGE 01'){
+        matrix {
+            axes {
+                axis {
+                    name 'NAVEGADOR'
+                    values 'chrome'
+                }
+                axis {
+                    name 'PLATFORM'
+                    values  'windows', 'macos'
+                }
+            }
+            stages {
+                stage('Build and test') {
+                    //
+                }
+                stage('Release') {
+                    // ...
+                }
 
-            steps{
-
-                echo "Pipeline Usando Jenkinsfile"
-
+                
             }
         }
     }
