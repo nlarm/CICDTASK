@@ -17,7 +17,7 @@ pipeline {
     }
 
     triggers { 
-        cron('H H(9-16)/2 * * 1-5') # once in every two hours slot between 9 AM and 5 PM every weekday (perhaps at 10:38 AM, 12:38 PM, 2:38 PM, 4:38 PM)
+        cron('H H(9-16)/2 * * 1-5') // Once in every two hours slot between 9 AM and 5 PM every weekday (perhaps at 10:38 AM, 12:38 PM, 2:38 PM, 4:38 PM)
     }
 
     post{
@@ -35,7 +35,7 @@ pipeline {
         stage('Primeiro Stage') { 
             steps {
                 echo "${params.PERSON}"
-                echo "Nossos nomes sao ${NOMES}" # NOME=Adriana_Daniel_Nefi
+                echo "Nossos nomes sao ${NOMES}" // NOME=Adriana_Daniel_Nefi
             }
         }
         stage('Segundo Stage') { 
@@ -44,7 +44,7 @@ pipeline {
             }           
             steps {
                 echo "${params.PERSON}"
-                echo "Meu nome é ${NOME}"  # NOME=Morais
+                echo "Meu nome é ${NOME}"  
             }
         }
         stage('Terceiro Stage') { 
@@ -76,10 +76,10 @@ pipeline {
             }
             stages {
                 stage('Build and test') {
-                    //
+                    
                 }
                 stage('Release') {
-                    // ...
+                    
                 }
 
                 
