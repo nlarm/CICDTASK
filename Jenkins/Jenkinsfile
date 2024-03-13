@@ -1,7 +1,7 @@
 pipeline {
     agent any
 
-    environment { 
+    environment {
         NOMES = 'Adriana_Daniel_Nefi'
     }
 
@@ -12,76 +12,80 @@ pipeline {
         timestamps()
     }
 
-    parameters { 
+    parameters {
         text(name: 'BIOGRAPHY', defaultValue: 'Best testers', description: 'Message to represent the group')
     }
 
-    triggers { 
-        cron('H H(9-16)/2 * * 1-5') // Once in every two hours slot between 9 AM and 5 PM every weekday (perhaps at 10:38 AM, 12:38 PM, 2:38 PM, 4:38 PM)
+    triggers {
+        cron('H H(9-16)/2 * * 1-5')
+        // Once in every two hours slot between 9 AM and 5 PM every weekday
+        // (perhaps at 10:38 AM, 12:38 PM, 2:38 PM, 4:38 PM)
     }
 
-    post{
-        success{ echo "success"}
-        aborted{ echo "aborted"}
-        failure{ echo "failure"}
-        unstable{ echo "unstable"}
-        always{ echo "always"}
-        unsuccessful{ echo "unsuccessful"}
-        changed{ echo "changed"}
-        fixed{ echo "fixed"}
+    post {
+        success { echo 'success' }
+        aborted { echo 'aborted' }
+        failure { echo 'failure' }
+        unstable { echo 'unstable' }
+        always { echo 'always' }
+        unsuccessful { echo 'unsuccessful' }
+        changed { echo 'changed' }
+        fixed { echo 'fixed' }
     }
 
     stages {
-        stage('Primeiro Stage') { 
+        stage('Primeiro Stage') {
             steps {
                 echo "${params.PERSON}"
                 echo "Nossos nomes sao ${NOMES}" // NOME=Adriana_Daniel_Nefi
             }
         }
-        stage('Segundo Stage') { 
-            environment { 
+        stage('Segundo Stage') {
+            environment {
                 NOME = 'Nefi_Daniel_Adriana'
-            }           
+            }
             steps {
                 echo "${params.PERSON}"
-                echo "Meu nome é ${NOME}"  
+                echo "Meu nome é ${NOME}"
             }
         }
-        stage('Terceiro Stage') { 
-             input{
-                message "Continuar?"
-                ok "Sim!"
-                submitter 'Eu,Voce,Ele'
-                parameters {
-                   string(name: 'MENSAGEM', description: 'Digite uma mensagem', defaultValue: 'Vamos em frente')
-                }
-            }
-            steps { echo 'Continuamos, com a mensagem: ${MENSAGEM}' }
-        }
-        stage('Quarto Stage') { 
+        stage('Quarto Stage') {
             when { environment name: 'NOME', value: 'Adriana' }
-            steps { echo "É ELA" } 
+            steps { echo 'É ELA' }
         }
 
         stage('Matrix') {
             matrix {
                 axes {
+                    /* groovylint-disable-next-line NestedBlockDepth */
                     axis {
                         name 'NAVEGADOR'
                         values 'chrome'
+                    /* groovylint-disable-next-line NestedBlockDepth */
                     }
                     axis {
                         name 'PLATFORM'
                         values  'windows', 'macos'
                     }
+                /* groovylint-disable-next-line NestedBlockDepth */
                 }
                 stages {
                     stage('Build and test') {
-                        
+                        input {
+                            message 'Continuar?'
+                            ok 'Sim!'
+                            submitter 'Eu,Voce,Ele'
+                            /* groovylint-disable-next-line NestedBlockDepth */
+                            parameters {
+                                string(name: 'MENSAGEM', description: 'Digite uma mensagem', defaultValue: 'Vamos em frente')
+                            }
+                        }
+
+                        steps { echo 'Continuamos, com a mensagem: ${MENSAGEM}' }
                     }
-                    stage('Release') {
-                        
-                    }
+                }
+                stage('Release') {
+                    
                 }
             }
         }
