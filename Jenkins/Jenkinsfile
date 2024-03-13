@@ -1,0 +1,119 @@
+pipeline {
+    agent any|none|label|docker|dockerfile|kubernetes
+
+    environment { 
+        NOME = 'Tales'
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '1'))
+        disableConcurrentBuilds()
+        newContainerPerStage()
+        skipStagesAfterUnstable()
+        parallelsAlwaysFailFast()
+        retry(3)
+        timeout(time: 1, unit: 'MINUTES')
+        timestamps()
+    }
+
+    parameters { 
+        string(name: 'STRING', defaultValue: 'Alguma String', description: '')
+        text(name: 'TEXT', defaultValue: 'Stgring\nMulti\nLine\n', description: '')
+        booleanParam(name: 'BOOLEAN', defaultValue: true, description: '')
+        choice(name: 'CHOICE', choices: ['um', 'dois', 'tres'], description: '')
+        password(name: 'PASSWORD', defaultValue: 'senha', description: 'Senha secreta')
+    }
+
+    triggers {
+        cron('H */4 * * 1-5') 
+        pollSCM('H */4 * * 1-5')
+        upstream(upstreamProjects: 'job1,job2', threshold: hudson.model.Result.SUCCESS)
+    }
+
+    post{
+        success{ echo "success"}
+        aborted{ echo "aborted"}
+        failure{ echo "failure"}
+        unstable{ echo "unstable"}
+        always{ echo "always"}
+        unsuccessful{ echo "unsuccessful"}
+        changed{ echo "changed"}
+        fixed{ echo "fixed"}
+    }
+
+    stages {
+        stage('Primeiro Stage') { 
+            steps {
+                echo "Meu nome é ${NOME}" # NOME=Tales
+            }
+        }
+        stage('Segundo Stage') { 
+            environment { 
+                NOME = 'Morais'
+            }           
+            steps {
+                echo "Meu nome é ${NOME}"  # NOME=Morais
+            }
+        }
+        stage('Terceiro Stage') { 
+             input{
+                message "Continuar?"
+                ok "Sim!"
+                submitter 'Eu,Voce,Ele'
+                parameters {
+                   string(name: 'MENSAGEM', description: 'Digite uma mensagem', defaultValue: 'Mensagem padrão')
+                }
+            }
+            steps { echo 'Continuamos, com a mensagem: ${MENSAGEM}' }
+        }
+        stage('Quarto Stage') { 
+            when { environment name: 'NOME', value: 'Tales' }
+            steps { echo "Variavel nome ainda é Tales" } 
+        }
+
+        stage('Quinto Stage') { 
+            when { equals expected: 'dois', actual: params.CHOICE }.
+            steps { echo "Choice: dois" } 
+        }
+
+        matrix {
+            axes {
+                axis {
+                    name 'NAVEGADOR'
+                    values 'chrome', 'firefox', 'edge'
+                }
+                axis {
+                    name 'PLATFORM'
+                    values 'linux', 'windows', 'macos'
+                }
+                axis {
+                    name 'ARCHITECTURE'
+                    values '32-bit', '64-bit'
+                }
+            }
+            stages {
+                stage('Teste Front-end') {
+                    //
+                }
+                stage('Teste Back-end') {
+                    // ...
+                }
+
+                stage('Execuções paralelas') {
+                    parallel {
+                        stage('Paralelo 11') {
+                            steps {
+                                echo "Paralelo 1"
+                            }
+                        }
+                        stage('Paralelo 2') {
+                            steps {
+                                echo "Paralelo 2"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
