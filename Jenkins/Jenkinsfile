@@ -1,90 +1,109 @@
+import java.util.Random
+
+ALUNOS = ['Adriana','Daniel','Nefi'] // Array para declaração de opções campo entrega
+
 pipeline {
-    agent any
-
-    environment {
-        NOMES = 'Adriana_Daniel_Nefi'
+    agent any // Agente -> any|none|label|docker|dockerfile|kubernetes
+	
+    environment { 
+		AMBIENTE = 'CICD' // Mmbiente
+	} 
+	
+    triggers { 
+		cron('00 20 * * 5') // Quando vai executar
+	} 
+    
+	options { 
+		retry(2) // Tentativas de execução
+		timeout(time: 1, unit: 'MINUTES') // timeout
+	} 
+    
+    parameters { // Parametros
+        booleanParam(name: 'AVALIACAO', defaultValue: true, description: 'Avaliação finalizada?')
+        choice(name: 'ENTREGA', choices: ALUNOS, description: 'Quem finalizou o trabalho?')
     }
-
-    options {
-        skipDefaultCheckout()
-        retry(2)
-        timeout(time: 30, unit: 'SECONDS')
-        timestamps()
-    }
-
-    parameters {
-        text(name: 'BIOGRAPHY', defaultValue: 'Best testers', description: 'Message to represent the group')
-    }
-
-    triggers {
-        cron('H H(9-16)/2 * * 1-5')
-        // Once in every two hours slot between 9 AM and 5 PM every weekday
-        // (perhaps at 10:38 AM, 12:38 PM, 2:38 PM, 4:38 PM)
-    }
-
-    post {
-        success { echo 'success' }
-        aborted { echo 'aborted' }
-        failure { echo 'failure' }
-        unstable { echo 'unstable' }
-        always { echo 'always' }
-        unsuccessful { echo 'unsuccessful' }
-        changed { echo 'changed' }
-        fixed { echo 'fixed' }
-    }
-
+	
     stages {
-        stage('Primeiro Stage') {
-            steps {
-                echo "${params.PERSON}"
-                echo "Nossos nomes sao ${NOMES}" // NOME=Adriana_Daniel_Nefi
+        stage('Entregar trabalho') { steps { script {
+            echo "O aluno ${params.ENTREGA} finalizou a avaliação"
+            withCredentials([usernamePassword(credentialsId: 'ENTREGAS', usernameVariable: 'MATERIA', passwordVariable: 'TROCAR123')]) {
+                echo "O aluno ${params.ENTREGA} finalizou a avaliação da  ${MATERIA}. (${SENHA})"
             }
-        }
-        stage('Segundo Stage') {
-            environment {
-                NOME = 'Nefi_Daniel_Adriana'
-            }
-            steps {
-                echo "${params.PERSON}"
-                echo "Meu nome é ${NOME}"
-            }
-        }
-        stage('Quarto Stage') {
-            when { environment name: 'NOME', value: 'Adriana' }
-            steps { echo 'É ELA' }
-        }
+        }}}
+ 	
+	stage('Avaliacao') { steps { script {
+            if (params.AVALIACAO) {
+                echo "Verificando notas"
+                for(aluno in ALUNOS) {
+                    echo "${aluno} entregou a avaliação?"
+                }
+            } else  { echo "reprovado."}
+        }}}
 
-        stage('Matrix') {
+        stage('Corrigir avaliação') {  //executa em diferentes versões, por exemplo, navegadores diferentes
             matrix {
-                axes {
-                    /* groovylint-disable-next-line NestedBlockDepth */
+                agent any
+                axes { 
                     axis {
-                        name 'NAVEGADOR'
-                        values 'chrome'
-                    /* groovylint-disable-next-line NestedBlockDepth */
+                        name 'ATIVIDADE'
+                        values 'AT1', 'AT2', 'AT3'
                     }
                     axis {
-                        name 'PLATFORM'
-                        values  'windows', 'macos'
+                        name 'MATERIA'
+                        values 'CICD', 'PRINCIPIOS DE TESTES'
                     }
-                /* groovylint-disable-next-line NestedBlockDepth */
                 }
-                stages {
-                    stage('Build and test') {
-                        input {
-                            message 'Continuar?'
-                            ok 'Sim!'
-                            submitter 'Eu,Voce,Ele'
-                            /* groovylint-disable-next-line NestedBlockDepth */
-                            parameters {
-                                string(name: 'MENSAGEM', description: 'Digite uma mensagem', defaultValue: 'Vamos em frente')
-                            }
-                        }
-
-                        steps { echo 'Continuamos, com a mensagem: ${MENSAGEM}' }
+                stages { stage('Corrigir atividade') { steps { script { 
+                    echo "Corrigindo a ${Atividade} da disciplina ${MATERIA}."
+                }}}}
+            }
+        }
+        
+        stage('Atividade entregue quando') {
+            steps { script {
+                parallel(
+                    Adriana: {
+                        sleep (new Random().nextInt(10))
+                        echo "O aluno ${ALUNOS[0]} terminou a atividade em sala"
+                    },
+                    Daniel: {
+                        sleep (new Random().nextInt(10))
+                        echo "O aluno ${ALUNOS[1]} não terminou a atividade em tempo hábil"
+                    },
+                    Nefi: {
+                        sleep (new Random().nextInt(10))
+                        echo "O aluno ${ALUNOS[2]} não entregou a atividade"
                     }
+                )
+            }}
+        }
+        
+        stage('Finalizar materia') {
+            input{
+                message "Avaliação entregue?"
+                ok "Sim!"
+                parameters {
+                   string(name: 'HORA', description: 'Horário do final da aula')
                 }
             }
+            steps { echo "A avaliação acabou às ${HORA}." }
+        }
+        
+        stage('Ultima aula?') {
+            when { expression { params.ULTIMA } }
+            steps { echo "Acabou a materia." }
         }
     }
+    
+    post { 
+		success{ echo "success"}
+        aborted{ echo "aborted"}
+        failure{ echo "failure"}
+        unstable{ echo "unstable"}
+        always{ echo "always"}
+        unsuccessful{ echo "unsuccessful"}
+        changed{ echo "changed"}
+        fixed{ echo "fixed"}
+	}
+		
 }
