@@ -31,9 +31,9 @@ pipeline {
             steps { 
                 script {
                     echo "O aluno ${params.ENTREGA} finalizou a avaliação"
-                    withCredentials([usernamePassword(credentialsId: 'ENTREGAS', usernameVariable: 'MATERIA', passwordVariable: 'TROCAR123')]) {
-                    echo "O aluno ${params.ENTREGA} finalizou a avaliação da  ${MATERIA}. (${SENHA})"
-                    }
+                    //withCredentials([usernamePassword(credentialsId: 'ENTREGAS', usernameVariable: 'MATERIA', passwordVariable: 'TROCAR123')]) {
+                    //echo "O aluno ${params.ENTREGA} finalizou a avaliação da  ${MATERIA}. (${SENHA})"
+                    //}
                 }
             }
         }
@@ -125,7 +125,7 @@ pipeline {
 
     post { 
         success {echo "success"}
-        // aborted {echo "aborted"}
-        // failure {echo "failure"}
+        aborted {echo "aborted"}
+        failure {echo "failure"}
     }
 }
