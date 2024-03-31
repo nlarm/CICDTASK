@@ -129,12 +129,12 @@ pipeline {
 
     post { 
         success {echo "success"}
-        aborted {echo "aborted"}
-        failure {echo "failure"}
-        unstable {echo "unstable"}
-        always {echo "always"}
-        unsuccessful {echo "unsuccessful"}
-        changed {echo "changed"}
-        fixed {echo "fixed"}
+        // aborted {echo "aborted"}
+        // failure {echo "failure"}
+        // unstable {echo "unstable"}
+        // always {echo "always"}
+        // unsuccessful {echo "unsuccessful"}
+        // changed {echo "changed"}
+        // fixed {echo "fixed"}
     }
 }
