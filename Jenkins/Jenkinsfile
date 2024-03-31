@@ -22,8 +22,8 @@ pipeline {
 
     parameters { // Parametros
         booleanParam(name: 'AVALIACAO', defaultValue: true, description: 'Avaliação finalizada?')
-        choice(name: 'ENTREGA', choices: ALUNOS, description: 'Quem finalizou o trabalho?')
         booleanParam(name: 'ULTIMAAULA', defaultValue: true, description: 'É a última aula?')
+        choice(name: 'ENTREGA', choices: ALUNOS, description: 'Quem finalizou o trabalho?')
     }
 
     stages {
@@ -118,9 +118,8 @@ pipeline {
         }
 
         stage('Ultima aula?') {
-            if (params.ULTIMAAULA) {
-                steps {  echo "Acabou a materia."}
-            }
+            when { expression { params.ULTIMAAULA } {
+            steps {  echo "Acabou a materia." }
         }
     }
 
