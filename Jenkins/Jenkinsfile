@@ -8,7 +8,7 @@ pipeline {
     agent any // Agente -> any|none|label|docker|dockerfile|kubernetes
 
     environment {
-        AMBIENTE = 'CICD' // Mmbiente
+        AMBIENTE = 'CICD' // Ambiente
     }
 
     triggers {
@@ -17,7 +17,7 @@ pipeline {
 
     options {
         retry(2) // Tentativas de execução
-        timeout(time: 1, unit: 'MINUTES') // timeout
+        timeout(time: 2, unit: 'MINUTES') // timeout
     }
 
     parameters { // Parametros
@@ -30,9 +30,9 @@ pipeline {
             steps { 
                 script {
                     echo "O aluno ${params.ENTREGA} finalizou a avaliação"
-                //withCredentials([usernamePassword(credentialsId: 'ENTREGAS', usernameVariable: 'MATERIA', passwordVariable: 'TROCAR123')]) {
-                //    echo "O aluno ${params.ENTREGA} finalizou a avaliação da  ${MATERIA}. (${SENHA})"
-                //}
+                    //withCredentials([usernamePassword(credentialsId: 'ENTREGAS', usernameVariable: 'MATERIA', passwordVariable: 'TROCAR123')]) {
+                    //    echo "O aluno ${params.ENTREGA} finalizou a avaliação da  ${MATERIA}. (${SENHA})"
+                    //}
                 }
             }
         }
@@ -62,7 +62,7 @@ pipeline {
                 axes { 
                     axis {
                         name 'ATIVIDADE'
-                        values 'AT1', 'AT2', 'AT3'
+                        values 'AT1', 'AT2'
                     }
                     axis {
                         name 'MATERIA'
@@ -82,7 +82,7 @@ pipeline {
             }
         }
 
-        stage('Atividade entregue quando') {
+        stage('Atividade entregue') {
             steps { 
                 script {
                     parallel(
@@ -131,10 +131,5 @@ pipeline {
         success {echo "success"}
         // aborted {echo "aborted"}
         // failure {echo "failure"}
-        // unstable {echo "unstable"}
-        // always {echo "always"}
-        // unsuccessful {echo "unsuccessful"}
-        // changed {echo "changed"}
-        // fixed {echo "fixed"}
     }
 }
