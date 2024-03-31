@@ -118,7 +118,7 @@ pipeline {
         }
 
         stage('Ultima aula?') {
-            when { expression { params.ULTIMAAULA } {
+            if { expression { params.ULTIMAAULA } {
                 steps {  echo "Acabou a materia."}
         }
     }
