@@ -1,4 +1,4 @@
-/* groovylint-disable BlockEndsWithBlankLine, CompileStatic, DuplicateNumberLiteral, FileEndsWithoutNewline, LineLength, NestedBlockDepth, SpaceAfterComma, SpaceAfterOpeningBrace, SpaceBeforeClosingBrace, SpaceBeforeOpeningBrace, TrailingWhitespace, UnnecessaryGString, UnnecessaryGroovyImport */
+/* groovylint-disable BlockEndsWithBlankLine, CompileStatic, DuplicateNumberLiteral, FileEndsWithoutNewline, Indentation, LineLength, NestedBlockDepth, SpaceAfterComma, SpaceAfterOpeningBrace, SpaceBeforeClosingBrace, SpaceBeforeOpeningBrace, TrailingWhitespace, UnnecessaryGString, UnnecessaryGroovyImport */
 
 import java.security.SecureRandom
 
@@ -87,16 +87,16 @@ pipeline {
                 script {
                     parallel(
                         Adriana: {
-                            sleep(new SecureRandom().nextInt(10))
+                            sleep(new Random().nextInt(10))
                             echo "O aluno ${ALUNOS[0]} terminou a atividade em sala"
                         },
                         
                         Daniel: {
-                            sleep(new SecureRandom().nextInt(10))
+                            sleep(new Random().nextInt(10))
                             echo "O aluno ${ALUNOS[1]} não terminou a atividade em tempo hábil"
                         },
                         Nefi: {
-                            sleep(new SecureRandom().nextInt(10))
+                            sleep(new Random().nextInt(10))
                             echo "O aluno ${ALUNOS[2]} não entregou a atividade"
                         }
                     )
@@ -112,12 +112,18 @@ pipeline {
                    string(name: 'HORA', description: 'Horário do final da aula')
                 }
             }
+            
             steps { echo "A avaliação acabou às ${HORA}." }
         }
 
         stage('Ultima aula?') {
-            when { expression { params.ULTIMA } }
-            steps { echo "Acabou a materia." }
+            when { 
+                expression { params.ULTIMA } 
+                }
+            
+            steps { 
+                echo "Acabou a materia." 
+            }
         }
     }
 
